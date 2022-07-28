@@ -4,6 +4,8 @@
 // CDlgVideo 对话框
 
 
+#include <afxdialogex.h>
+
 #include "../libEasyPlayer/libEasyPlayerAPI.h"
 
 
@@ -15,6 +17,7 @@ public:
 	CDlgVideo(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CDlgVideo();
 
+	CString  GetRtspUrl(int i);
 	void	SetWindowId(int _windowId);
 	void	SetShownToScale(int shownToScale);
 	void	SetURL(char *url);

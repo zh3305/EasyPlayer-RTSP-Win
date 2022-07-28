@@ -14,9 +14,9 @@ IMPLEMENT_DYNAMIC(CDlgVideo, CDialogEx)
 CDlgVideo::CDlgVideo(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CDlgVideo::IDD, pParent)
 {
-	m_WindowId	=	-1;
-	m_ChannelId	=	-1;
-	bDrag		=	false;
+	m_WindowId = -1;
+	m_ChannelId = -1;
+	bDrag = false;
 	m_bDestoryWnd = false;
 	InitialComponents();
 }
@@ -43,14 +43,14 @@ BEGIN_MESSAGE_MAP(CDlgVideo, CDialogEx)
 	ON_WM_RBUTTONUP()
 	ON_WM_PAINT()
 	ON_BN_CLICKED(IDC_CHECK_RTPTRANSMODE, &CDlgVideo::OnBnClickedCheckRtptransmode)
-//	ON_BN_CLICKED(IDC_BUTTON_SEEK, &CDlgVideo::OnBnClickedButtonSeek)
+	//	ON_BN_CLICKED(IDC_BUTTON_SEEK, &CDlgVideo::OnBnClickedButtonSeek)
 END_MESSAGE_MAP()
 
 
 // CDlgVideo 消息处理程序
 LRESULT CDlgVideo::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	if (WM_PAINT == message || WM_SIZE==message)
+	if (WM_PAINT == message || WM_SIZE == message)
 	{
 		UpdateComponents();
 	}
@@ -64,15 +64,15 @@ bool MByteToWChar(LPCSTR lpcszStr, LPWSTR lpwszStr, DWORD dwSize)
 	// Get the required size of the buffer that receives the Unicode
 	// string.
 	DWORD dwMinSize;
-	dwMinSize = MultiByteToWideChar (CP_ACP, 0, lpcszStr, -1, NULL, 0);
- 
-	if(dwSize < dwMinSize)
+	dwMinSize = MultiByteToWideChar(CP_ACP, 0, lpcszStr, -1, NULL, 0);
+
+	if (dwSize < dwMinSize)
 	{
 		return false;
 	}
- 
+
 	// Convert headers from ASCII to Unicode.
-	MultiByteToWideChar (CP_ACP, 0, lpcszStr, -1, lpwszStr, dwMinSize);  
+	MultiByteToWideChar(CP_ACP, 0, lpcszStr, -1, lpwszStr, dwMinSize);
 	return true;
 }
 BOOL CDlgVideo::OnInitDialog()
@@ -123,7 +123,7 @@ void CDlgVideo::OnMouseMove(UINT nFlags, CPoint point)
 	{
 		CRect rcClient;
 		GetClientRect(&rcClient);
-		if (! rcClient.IsRectEmpty())
+		if (!rcClient.IsRectEmpty())
 		{
 			int nX = (int)(((float)point.x / (float)rcClient.Width() * 100.0f));
 			int nY = (int)(((float)point.y / (float)rcClient.Height() * 100.0f));
@@ -135,13 +135,17 @@ void CDlgVideo::OnMouseMove(UINT nFlags, CPoint point)
 	CDialogEx::OnMouseMove(nFlags, point);
 }
 
-void	CDlgVideo::SetWindowId(int _windowId)	
+void	CDlgVideo::SetWindowId(int _windowId)
 {
 	m_WindowId = _windowId;
 
-	if (m_WindowId == 0)
-	{
-		if (NULL != pEdtURL)		pEdtURL->SetWindowText(TEXT("rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov"));
+	// if (m_WindowId == 0)
+	// {
+	// 	if (NULL != pEdtURL)		pEdtURL->SetWindowText(TEXT("rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov"));
+	// }
+	if (NULL != pEdtURL) {
+		pEdtURL->SetWindowText(GetRtspUrl(_windowId));
+		// OnBnClickedButtonPreview();
 	}
 	//if (m_WindowId == 1)
 	//{
@@ -149,10 +153,35 @@ void	CDlgVideo::SetWindowId(int _windowId)
 	//	if (NULL != pEdtURL)		pEdtURL->SetWindowText(TEXT("rtsp://192.168.1.101:554/id=0"));
 	//}	
 }
-void	CDlgVideo::SetURL(char *url)
+int sourse[] = { 21,22,23,24,25,26,27,28,29 };
+int cul[] = { 0,1 };//,2,3,4,5
+CString CDlgVideo::GetRtspUrl(int i)
 {
-	wchar_t wszURL[128] = {0,};
-	MByteToWChar(url, wszURL, sizeof(wszURL)/sizeof(wszURL[0]));
+	CString s;
+	int sindex = i / (sizeof(cul) / sizeof(int));
+	if (sindex>= (sizeof(sourse) / sizeof(int)))
+	{
+		sindex = i % (sizeof(sourse) / sizeof(int));
+	}
+	if (cul[i % 5]==0)
+	{
+		s.Format(_T("rtsp://192.168.1.141/stream%d"),  sourse[sindex]);
+		
+	}
+	else
+	{
+		s.Format(_T("rtsp://192.168.1.141/stream%d%d"), cul[i % 5], sourse[sindex]);
+	}
+
+	return s;
+}
+
+
+
+void	CDlgVideo::SetURL(char* url)
+{
+	wchar_t wszURL[128] = { 0, };
+	MByteToWChar(url, wszURL, sizeof(wszURL) / sizeof(wszURL[0]));
 	if (NULL != pEdtURL)		pEdtURL->SetWindowText(wszURL);
 }
 
@@ -166,11 +195,11 @@ void	CDlgVideo::SetShownToScale(int shownToScale)
 
 void	CDlgVideo::InitialComponents()
 {
-	pDlgRender	=	NULL;
-	pEdtURL		=	NULL;
-	pChkOSD		=	NULL;
-	pSliderCache=	NULL;
-	pBtnPreview	=	NULL;
+	pDlgRender = NULL;
+	pEdtURL = NULL;
+	pChkOSD = NULL;
+	pSliderCache = NULL;
+	pBtnPreview = NULL;
 	pChkRTPTransMode = NULL;
 	pChkDecodeMode = NULL;
 	pBtnSeek = NULL;
@@ -185,13 +214,13 @@ void	CDlgVideo::CreateComponents()
 		pDlgRender->ShowWindow(SW_SHOW);
 	}
 
-	__CREATE_WINDOW(pEdtURL,		CEdit,		IDC_EDIT_RTSP_URL);
-	__CREATE_WINDOW(pChkOSD,		CButton,	IDC_CHECK_OSD);
-	__CREATE_WINDOW(pSliderCache,	CSliderCtrl,IDC_SLIDER_CACHE);
-	__CREATE_WINDOW(pBtnPreview,	CButton,	IDC_BUTTON_PREVIEW);
-	__CREATE_WINDOW(pChkRTPTransMode	,	CButton,	IDC_CHECK_RTPTRANSMODE);
-	__CREATE_WINDOW(pChkDecodeMode	,	CButton,	IDC_CHECK_DECODEMODE);
-	__CREATE_WINDOW(pBtnSeek	,	CButton,	IDC_BUTTON_SEEK);
+	__CREATE_WINDOW(pEdtURL, CEdit, IDC_EDIT_RTSP_URL);
+	__CREATE_WINDOW(pChkOSD, CButton, IDC_CHECK_OSD);
+	__CREATE_WINDOW(pSliderCache, CSliderCtrl, IDC_SLIDER_CACHE);
+	__CREATE_WINDOW(pBtnPreview, CButton, IDC_BUTTON_PREVIEW);
+	__CREATE_WINDOW(pChkRTPTransMode, CButton, IDC_CHECK_RTPTRANSMODE);
+	__CREATE_WINDOW(pChkDecodeMode, CButton, IDC_CHECK_DECODEMODE);
+	__CREATE_WINDOW(pBtnSeek, CButton, IDC_BUTTON_SEEK);
 
 	if (NULL != pEdtURL)			pEdtURL->SetWindowText(TEXT("rtsp://"));
 	if (NULL != pSliderCache)	pSliderCache->SetRange(1, 10);
@@ -214,12 +243,12 @@ void	CDlgVideo::UpdateComponents()
 	if (rcClient.IsRectEmpty())		return;
 
 	CRect	rcRender;
-	rcRender.SetRect(rcClient.left, rcClient.top, rcClient.right, rcClient.bottom-20);
+	rcRender.SetRect(rcClient.left, rcClient.top, rcClient.right, rcClient.bottom - 20);
 	__MOVE_WINDOW(pDlgRender, rcRender);
 	if (NULL != pDlgRender)		pDlgRender->Invalidate();
 
 	CRect	rcURL;
-	rcURL.SetRect(rcClient.left, rcRender.bottom+2, rcClient.right-300, rcClient.bottom);
+	rcURL.SetRect(rcClient.left, rcRender.bottom + 2, rcClient.right - 300, rcClient.bottom);
 	__MOVE_WINDOW(pEdtURL, rcURL);
 	if (NULL != pEdtURL)		pEdtURL->Invalidate();
 
@@ -227,25 +256,25 @@ void	CDlgVideo::UpdateComponents()
 	CRect	rcRTPMode;
 	rcRTPMode.SetRect(rcURL.right + 10, rcURL.top, rcURL.right + 2 + 50, rcURL.bottom);
 	__MOVE_WINDOW(pChkRTPTransMode, rcRTPMode);
-	if (NULL != pChkRTPTransMode)		pChkRTPTransMode->Invalidate();	
+	if (NULL != pChkRTPTransMode)		pChkRTPTransMode->Invalidate();
 
 	CRect	rcOSD;
-	rcOSD.SetRect(rcRTPMode.right+10, rcRTPMode.top, rcRTPMode.right+2+55, rcRTPMode.bottom);
+	rcOSD.SetRect(rcRTPMode.right + 10, rcRTPMode.top, rcRTPMode.right + 2 + 55, rcRTPMode.bottom);
 	__MOVE_WINDOW(pChkOSD, rcOSD);
 	if (NULL != pChkOSD)		pChkOSD->Invalidate();
 
 	CRect	rcDecodeMode;
-	rcDecodeMode.SetRect(rcOSD.right+10, rcOSD.top, rcOSD.right+2+60, rcOSD.bottom);
+	rcDecodeMode.SetRect(rcOSD.right + 10, rcOSD.top, rcOSD.right + 2 + 60, rcOSD.bottom);
 	__MOVE_WINDOW(pChkDecodeMode, rcDecodeMode);
-	if (NULL != pChkDecodeMode)		pChkDecodeMode->Invalidate();	
+	if (NULL != pChkDecodeMode)		pChkDecodeMode->Invalidate();
 
 	CRect	rcCache;
-	rcCache.SetRect(rcDecodeMode.right+2, rcDecodeMode.top, rcDecodeMode.right+2+70, rcDecodeMode.bottom);
+	rcCache.SetRect(rcDecodeMode.right + 2, rcDecodeMode.top, rcDecodeMode.right + 2 + 70, rcDecodeMode.bottom);
 	__MOVE_WINDOW(pSliderCache, rcCache);
 	if (NULL != pSliderCache)		pSliderCache->Invalidate();
 
 	CRect	rcPreview;
-	rcPreview.SetRect(rcCache.right+2, rcURL.top-2, rcClient.right, rcURL.bottom);
+	rcPreview.SetRect(rcCache.right + 2, rcURL.top - 2, rcClient.right, rcURL.bottom);
 	__MOVE_WINDOW(pBtnPreview, rcPreview);
 	if (NULL != pBtnPreview)		pBtnPreview->Invalidate();
 }
@@ -264,12 +293,12 @@ void	CDlgVideo::DeleteComponents()
 bool __WCharToMByte(LPCWSTR lpcwszStr, LPSTR lpszStr, DWORD dwSize)
 {
 	DWORD dwMinSize;
-	dwMinSize = WideCharToMultiByte(CP_OEMCP,NULL,lpcwszStr,-1,NULL,0,NULL,FALSE);
-	if(dwSize < dwMinSize)
+	dwMinSize = WideCharToMultiByte(CP_OEMCP, NULL, lpcwszStr, -1, NULL, 0, NULL, FALSE);
+	if (dwSize < dwMinSize)
 	{
 		return false;
 	}
-	WideCharToMultiByte(CP_OEMCP,NULL,lpcwszStr,-1,lpszStr,dwSize,NULL,FALSE);
+	WideCharToMultiByte(CP_OEMCP, NULL, lpcwszStr, -1, lpszStr, dwSize, NULL, FALSE);
 	return true;
 }
 
@@ -281,50 +310,50 @@ void CDlgVideo::OnBnClickedButtonPreview()
 		m_ChannelId = -1;
 		EasyPlayer_CloseStream(nChannelId);
 
- 		if (NULL != pDlgRender)	pDlgRender->SetChannelId(m_ChannelId);
+		if (NULL != pDlgRender)	pDlgRender->SetChannelId(m_ChannelId);
 
-		if (NULL != pDlgRender)	
+		if (NULL != pDlgRender)
 		{
 			//设置录像停止状态
-			pDlgRender->SetChannelStatus(0,pDlgRender->channelStatus.showOSD);
+			pDlgRender->SetChannelStatus(0, pDlgRender->channelStatus.showOSD);
 			pDlgRender->Invalidate();
 		}
 		if (NULL != pBtnPreview)		pBtnPreview->SetWindowText(TEXT("Play"));
 	}
 	else
 	{
-		wchar_t wszURL[128] = {0,};
+		wchar_t wszURL[128] = { 0, };
 		if (NULL != pEdtURL)	pEdtURL->GetWindowTextW(wszURL, sizeof(wszURL));
 		if (wcslen(wszURL) < 1)		return;
 
-// 		wchar_t wszUsername[32] = {0,};
-// 		wchar_t wszPassword[32] = {0,};
-// 		if (NULL != pEdtUsername)	pEdtUsername->GetWindowText(wszUsername, sizeof(wszUsername));
-// 		if (NULL != pEdtPassword)	pEdtPassword->GetWindowText(wszPassword, sizeof(wszPassword));
+		// 		wchar_t wszUsername[32] = {0,};
+		// 		wchar_t wszPassword[32] = {0,};
+		// 		if (NULL != pEdtUsername)	pEdtUsername->GetWindowText(wszUsername, sizeof(wszUsername));
+		// 		if (NULL != pEdtPassword)	pEdtPassword->GetWindowText(wszPassword, sizeof(wszPassword));
 
-		char szURL[128] = {0,};
-		__WCharToMByte(wszURL, szURL, sizeof(szURL)/sizeof(szURL[0]));
-		char szUsername[32] = {0,};
-		char szPassword[32] = {0,};
-// 		__WCharToMByte(wszUsername, szUsername, sizeof(szUsername)/sizeof(szUsername[0]));
-// 		__WCharToMByte(wszPassword, szPassword, sizeof(szPassword)/sizeof(szPassword[0]));
+		char szURL[128] = { 0, };
+		__WCharToMByte(wszURL, szURL, sizeof(szURL) / sizeof(szURL[0]));
+		char szUsername[32] = { 0, };
+		char szPassword[32] = { 0, };
+		// 		__WCharToMByte(wszUsername, szUsername, sizeof(szUsername)/sizeof(szUsername[0]));
+		// 		__WCharToMByte(wszPassword, szPassword, sizeof(szPassword)/sizeof(szPassword[0]));
 
 		int nRtpOverTcp = 1;
 		if (NULL != pChkRTPTransMode)
 		{
-			nRtpOverTcp= pChkRTPTransMode->GetCheck();
+			nRtpOverTcp = pChkRTPTransMode->GetCheck();
 		}
 		bool bHardDecode = true;
 		if (pChkDecodeMode)
 		{
-			int nCheck = pChkDecodeMode->GetCheck() ;
-			if (nCheck== 1)
+			int nCheck = pChkDecodeMode->GetCheck();
+			if (nCheck == 1)
 			{
 				bHardDecode = true;
-			} 
+			}
 			else
 			{
-				bHardDecode = false ;
+				bHardDecode = false;
 			}
 		}
 
@@ -342,19 +371,19 @@ void CDlgVideo::OnBnClickedButtonPreview()
 			EASY_PALYER_OSD osd;
 			osd.alpha = 255;
 			osd.size = 35;
-			osd.color = RGB(255,0,255);
+			osd.color = RGB(255, 0, 255);
 			osd.rect.left = 10;
 			osd.rect.right = 5000;
 			osd.rect.top = 100;
 			osd.rect.bottom = 800;
-			osd.shadowcolor = RGB(0,0,0);
-			char* ss =  "这是EasyPlayer-RTSP-Win播放器 \r\n的字幕叠加接口的效果！！！\r\n以\"\\r\\n\"为换行结束符号\r\n注意：每行的长度不能超过128个字节\r\n总的OSD长度不能超过1024个字节";
-			strcpy(osd.stOSD ,ss);
-			EasyPlayer_ShowOSD(m_ChannelId, 1,  osd);
+			osd.shadowcolor = RGB(0, 0, 0);
+			char* ss = "这是EasyPlayer-RTSP-Win播放器 \r\n的字幕叠加接口的效果！！！\r\n以\"\\r\\n\"为换行结束符号\r\n注意：每行的长度不能超过128个字节\r\n总的OSD长度不能超过1024个字节";
+			strcpy(osd.stOSD, ss);
+			EasyPlayer_ShowOSD(m_ChannelId, 1, osd);
 #endif
 			CString strFilePath = GET_MODULE_FILE_INFO.strPath;
 			char sFilePath[MAX_PATH];
-			__WCharToMByte(strFilePath.GetBuffer(strFilePath.GetLength()), sFilePath, sizeof(sFilePath)/sizeof(sFilePath[0]));
+			__WCharToMByte(strFilePath.GetBuffer(strFilePath.GetLength()), sFilePath, sizeof(sFilePath) / sizeof(sFilePath[0]));
 
 			EasyPlayer_SetShownToScale(m_ChannelId, shownToScale);
 
@@ -371,23 +400,23 @@ void CDlgVideo::OnBnClickedButtonPreview()
 
 void CDlgVideo::LogErr(CString strLog)
 {
-	if(!strLog.IsEmpty())
+	if (!strLog.IsEmpty())
 	{
-		TCHAR* szLog = new TCHAR[strLog.GetLength()+1];
+		TCHAR* szLog = new TCHAR[strLog.GetLength() + 1];
 		StrCpy(szLog, strLog);
 		CWnd* m_pMainDlg = GetParent();
-		if(m_pMainDlg)
+		if (m_pMainDlg)
 			m_pMainDlg->PostMessage(MSG_LOG, 0, (LPARAM)szLog);
-// 		delete[] szLog;
-// 		szLog = NULL;
+		// 		delete[] szLog;
+		// 		szLog = NULL;
 	}
 }
 
-int CDlgVideo::EasyPlayerCallBack( int _channelId, int *_channelPtr, int _frameType, char *pBuf, EASY_FRAME_INFO* _frameInfo)
+int CDlgVideo::EasyPlayerCallBack(int _channelId, int* _channelPtr, int _frameType, char* pBuf, EASY_FRAME_INFO* _frameInfo)
 {
 	if (_frameType == EASY_SDK_EVENT_FRAME_FLAG)
 	{
-		TRACE( "%s", pBuf  );
+		TRACE("%s", pBuf);
 		CDlgVideo* pMaster = (CDlgVideo*)_channelPtr;
 		if (pMaster->m_bDestoryWnd)
 		{
@@ -398,7 +427,7 @@ int CDlgVideo::EasyPlayerCallBack( int _channelId, int *_channelPtr, int _frameT
 			CString str = (CString)pBuf;
 			pMaster->LogErr(str);
 		}
-		if (_frameInfo&&_frameInfo->codec == EASY_SDK_EVENT_CODEC_EXIT)
+		if (_frameInfo && _frameInfo->codec == EASY_SDK_EVENT_CODEC_EXIT)
 		{
 			//pMaster->OnBnClickedButtonPreview();
 			if (pMaster->m_ChannelId > 0)
@@ -408,12 +437,12 @@ int CDlgVideo::EasyPlayerCallBack( int _channelId, int *_channelPtr, int _frameT
 
 				if (NULL != pMaster->pDlgRender)	pMaster->pDlgRender->SetChannelId(pMaster->m_ChannelId);
 
-				if (NULL !=pMaster->pDlgRender)			pMaster->pDlgRender->Invalidate();
+				if (NULL != pMaster->pDlgRender)			pMaster->pDlgRender->Invalidate();
 				if (NULL != pMaster->pBtnPreview)		pMaster->pBtnPreview->SetWindowText(TEXT("Play"));
 			}
 
 		}
-		else if(_frameInfo && EASY_SDK_DECODE_VIDEO_FLAG == _frameInfo->codec )
+		else if (_frameInfo && EASY_SDK_DECODE_VIDEO_FLAG == _frameInfo->codec)
 		{
 
 		}
@@ -436,11 +465,11 @@ void CDlgVideo::OnBnClickedCheckOsd()
 
 void CDlgVideo::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	if( NULL != pScrollBar && NULL != pSliderCache &&
+	if (NULL != pScrollBar && NULL != pSliderCache &&
 		pSliderCache->GetDlgCtrlID() == pScrollBar->GetDlgCtrlID())
 	{
 		int iPos = pSliderCache->GetPos();
-		
+
 		if (m_ChannelId > 0)
 		{
 			EasyPlayer_SetFrameCache(m_ChannelId, iPos);

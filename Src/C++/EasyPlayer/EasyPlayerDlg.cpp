@@ -427,10 +427,14 @@ void	CEasyPlayerDlg::UpdateVideoPosition(LPRECT lpRect)
 
 
 						pVideoWindow->pDlgVideo[n].MoveWindow(&rcTmp);
-						if (! pVideoWindow->pDlgVideo[n].IsWindowVisible())
+						if (! pVideoWindow->pDlgVideo[n].IsWindowVisible()){
 							pVideoWindow->pDlgVideo[n].ShowWindow(SW_SHOW);
-
-
+							if(!( pVideoWindow->pDlgVideo[n].m_ChannelId > 0))
+							{
+								pVideoWindow->pDlgVideo[n].OnBnClickedButtonPreview();
+							}
+							
+						}
 						n ++;
 
 						nLeft += rcClient.Width() / nTimes;

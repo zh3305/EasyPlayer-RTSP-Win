@@ -32,7 +32,7 @@ namespace Client
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PlayerForm));
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.panel1 = new System.Windows.Forms.PictureBox();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.Snop_MenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Recode_MenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -234,7 +234,7 @@ namespace Client
 
         #endregion
 
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.PictureBox panel1;
         private System.Windows.Forms.Label Label;
         private System.Windows.Forms.TextBox StreamURI;
         private System.Windows.Forms.CheckBox rtpoverType;

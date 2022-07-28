@@ -6,3 +6,5 @@
 *.exp
 /Bin/C++/EasyPlayer-RTSPWebActiveX.lib
 /Bin/C++/EasyPlayerWebActiveX.lic
+/Src/C++/.vs/EasyPlayer-RTSP
+/Src/C#/.vs/EasyPlayer-RTSP/FileContentIndex
